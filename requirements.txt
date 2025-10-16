@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg2-binary
+pydantic[email]
+python-dotenv
+pydantic-settings
+python-jose[cryptography]
+passlib
+bcrypt==4.0.1 # <-- Fixamos a versão compatível com o passlib
