@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from app.core.database import engine
-from app.models import user_model
-from app.routers import user  # Importe o router do usuário
+from app.models import user_model, content_model # 1. Importamos o novo modelo
+from app.routers import user, content # 2. Importamos o novo router
 
-# Este comando cria as tabelas no banco de dados se elas não existirem
+# 3. Dizemos ao SQLAlchemy para criar a tabela de vídeos também
 user_model.Base.metadata.create_all(bind=engine)
+content_model.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="EduSocial API",
@@ -12,8 +13,9 @@ app = FastAPI(
     version="0.1.0"
 )
 
-# Inclua as rotas de usuário na aplicação principal
+# 4. Incluímos as rotas de conteúdo na nossa API
 app.include_router(user.router)
+app.include_router(content.router)
 
 @app.get("/")
 def read_root():
