@@ -23,3 +23,7 @@ class Video(Base):
     owner = relationship("User")
 
     comments = relationship("Comment", back_populates="video")
+
+    # cascade="all, delete-orphan" significa que se um vídeo for deletado,
+    # o quiz associado a ele também será deletado automaticamente.
+    quiz = relationship("Quiz", back_populates="video", uselist=False, cascade="all, delete-orphan")
