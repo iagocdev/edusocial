@@ -17,3 +17,10 @@ def create_video(db: Session, video: content_schema.VideoCreate, owner_id: int):
 def get_videos(db: Session, skip: int = 0, limit: int = 100):
     # Retorna uma lista de vídeos, ordenados pelos mais recentes
     return db.query(content_model.Video).order_by(content_model.Video.created_at.desc()).offset(skip).limit(limit).all()
+
+
+# app/crud/crud_content.py
+
+def get_video(db: Session, video_id: int):
+    # Busca um vídeo específico pelo seu ID
+    return db.query(content_model.Video).filter(content_model.Video.id == video_id).first()
