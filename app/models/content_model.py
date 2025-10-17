@@ -21,3 +21,5 @@ class Video(Base):
 
     # Esta linha cria a relação no nível do SQLAlchemy
     owner = relationship("User")
+
+    comments = relationship("Comment", back_populates="video")

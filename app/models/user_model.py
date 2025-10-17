@@ -1,6 +1,9 @@
 # app/models/user_model.py
-from sqlalchemy import Column, Integer, String, Enum
-from ..core.database import Base # Precisaremos criar este arquivo de conexão
+
+# 1. CORREÇÃO: Importamos 'Enum' do SQLAlchemy com um "apelido"
+from sqlalchemy import Column, Integer, String, Enum as SQLAlchemyEnum
+from sqlalchemy.orm import relationship
+from app.core.database import Base
 import enum
 
 class UserRole(str, enum.Enum):
@@ -15,4 +18,9 @@ class User(Base):
     full_name = Column(String, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
-    role = Column(Enum(UserRole), nullable=False, default=UserRole.ALUNO)
+
+    # 2. CORREÇÃO: Usamos o "apelido" que importamos
+    role = Column(SQLAlchemyEnum(UserRole), nullable=False, default=UserRole.ALUNO)
+
+    # Esta linha (que adicionamos no passo anterior) está correta
+    comments = relationship("Comment", back_populates="owner")

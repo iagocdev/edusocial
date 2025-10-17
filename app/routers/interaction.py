@@ -1,6 +1,7 @@
 # app/routers/interaction.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from typing import List # <-- 1. IMPORTAR List
 
 from ..crud import crud_interaction, crud_content
 from ..schemas import interaction_schema
@@ -45,3 +46,50 @@ def toggle_like_video(
         # 4. Se o like não existe, vamos CRIAR (curtir)
         crud_interaction.create_like(db, user_id=current_user.id, video_id=video_id)
         return {"detail": "Vídeo curtido!", "liked": True}
+    
+@router.post(
+    "/videos/{video_id}/comments", 
+    response_model=interaction_schema.Comment
+)
+def create_new_comment(
+    video_id: int,
+    comment: interaction_schema.CommentCreate,
+    db: Session = Depends(get_db),
+    current_user: user_model.User = Depends(security.get_current_user)
+):
+    """
+    Posta um novo comentário em um vídeo. (Endpoint protegido)
+    """
+    # 1. Verificar se o vídeo existe
+    video = crud_content.get_video(db, video_id=video_id)
+    if not video:
+        raise HTTPException(status_code=404, detail="Vídeo não encontrado")
+
+    # 2. Criar o comentário
+    return crud_interaction.create_comment(
+        db=db, comment=comment, owner_id=current_user.id, video_id=video_id
+    )
+
+@router.get(
+    "/videos/{video_id}/comments", 
+    response_model=List[interaction_schema.Comment]
+)
+def read_video_comments(
+    video_id: int,
+    skip: int = 0,
+    limit: int = 20,
+    db: Session = Depends(get_db)
+):
+    """
+    Lista todos os comentários de um vídeo. (Endpoint público)
+    """
+    # 1. Verificar se o vídeo existe
+    video = crud_content.get_video(db, video_id=video_id)
+    if not video:
+        raise HTTPException(status_code=404, detail="Vídeo não encontrado")
+
+    # 2. Buscar os comentários
+    comments = crud_interaction.get_comments_for_video(
+        db, video_id=video_id, skip=skip, limit=limit
+    )
+    return comments    

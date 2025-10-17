@@ -33,3 +33,12 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     email: str | None = None            
+
+
+# NOVO SCHEMA PARA EXIBIÇÃO PÚBLICA
+class UserPublic(BaseModel):
+    id: int
+    full_name: str | None = None
+
+    class Config:
+        from_attributes = True    
