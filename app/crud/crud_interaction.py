@@ -1,21 +1,20 @@
 # app/crud/crud_interaction.py
-from sqlalchemy.orm import Session
+
+# --- A CORREÇÃO ESTÁ AQUI ---
+# Nós importamos 'joinedload' da 'sqlalchemy.orm'
+from sqlalchemy.orm import Session, joinedload 
+
 from ..models import interaction_model
 from ..schemas import interaction_schema
 
+# --- FUNÇÕES DE LIKE (JÁ EXISTENTES) ---
 def get_like(db: Session, user_id: int, video_id: int):
-    """
-    Verifica se um usuário específico já curtiu um vídeo específico.
-    """
     return db.query(interaction_model.VideoLike).filter(
         interaction_model.VideoLike.user_id == user_id,
         interaction_model.VideoLike.video_id == video_id
     ).first()
 
 def create_like(db: Session, user_id: int, video_id: int):
-    """
-    Registra uma nova curtida no banco.
-    """
     db_like = interaction_model.VideoLike(user_id=user_id, video_id=video_id)
     db.add(db_like)
     db.commit()
@@ -23,13 +22,11 @@ def create_like(db: Session, user_id: int, video_id: int):
     return db_like
 
 def delete_like(db: Session, db_like: interaction_model.VideoLike):
-    """
-    Remove uma curtida do banco.
-    """
     db.delete(db_like)
     db.commit()
     return db_like
 
+# --- FUNÇÕES DE COMENTÁRIO (JÁ EXISTENTES) ---
 def create_comment(
     db: Session, 
     comment: interaction_schema.CommentCreate, 
@@ -52,5 +49,6 @@ def get_comments_for_video(db: Session, video_id: int, skip: int = 0, limit: int
     ).order_by(
         interaction_model.Comment.created_at.desc()
     ).options(
-        joinedload(interaction_model.Comment.owner) # <-- Mágica! Carrega os dados do dono junto
+        # Esta linha agora funciona porque 'joinedload' foi importado
+        joinedload(interaction_model.Comment.owner) 
     ).offset(skip).limit(limit).all()
