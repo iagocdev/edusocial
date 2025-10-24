@@ -6,7 +6,9 @@ from ..schemas import content_schema
 def create_video(db: Session, video: content_schema.VideoCreate, owner_id: int):
     # Cria um novo objeto Video com os dados do schema e o ID do dono
     db_video = content_model.Video(
-        **video.model_dump(), 
+        title=video.title,
+        description=video.description,
+        url=str(video.url),  # Convertemos o objeto HttpUrl de volta para string
         owner_id=owner_id
     )
     db.add(db_video)
